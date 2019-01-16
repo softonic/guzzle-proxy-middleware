@@ -3,16 +3,16 @@
 namespace Softonic\Proxy\Guzzle\Middleware;
 
 use Psr\Http\Message\RequestInterface;
-use Softonic\Proxy\Guzzle\Middleware\Repositories\ProxyBonanza;
+use Softonic\Proxy\Guzzle\Middleware\Interfaces\ProxyInterface;
 
 class ProxyManager
 {
     /**
-     * @var Proxy
+     * @var ProxyInterface
      */
     private $proxy;
 
-    public function __construct(ProxyBonanza $proxy)
+    public function __construct(ProxyInterface $proxy)
     {
         $this->proxy = $proxy;
     }
