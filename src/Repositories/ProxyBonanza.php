@@ -5,8 +5,9 @@ namespace Softonic\Proxy\Guzzle\Middleware\Repositories;
 use GuzzleHttp\Client as GuzzleClient;
 use Psr\Cache\CacheItemPoolInterface;
 use Softonic\Proxy\Guzzle\Middleware\Exceptions\ProxiesNotAvailable;
+use Softonic\Proxy\Guzzle\Middleware\Interfaces\ProxyInterface;
 
-class ProxyBonanza
+class ProxyBonanza implements ProxyInterface
 {
     const PROXY_BONANZA_API = 'https://api.proxybonanza.com/v1';
 

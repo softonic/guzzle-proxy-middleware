@@ -6,7 +6,9 @@ Guzzle Proxy Middleware
 [![Build Status](https://img.shields.io/travis/softonic/guzzle-proxy-middleware/master.svg?style=flat-square)](https://travis-ci.org/softonic/guzzle-proxy-middleware)
 [![Total Downloads](https://img.shields.io/packagist/dt/softonic/guzzle-proxy-middleware.svg?style=flat-square)](https://packagist.org/packages/softonic/guzzle-proxy-middleware)
 
-This package provides middleware for [guzzle](https://github.com/guzzle/guzzle/) for handling proxy connection using [proxy bonanza](https://proxybonanza.com).
+This package provides middleware for [guzzle](https://github.com/guzzle/guzzle/) for handling proxy connection using one of the following proxy services:
+- [Proxy Bonanza](https://proxybonanza.com)
+- [SSL Private Proxy](https://www.sslprivateproxy.com)
 
 Installation
 -------
@@ -22,17 +24,30 @@ Usage
 
 To use this middleware, you need to initialize it like:
 
+For Proxy Bonanza:
 ```php
 $proxyManager = new ProxyManager(
-    new Proxy(
+    new ProxyBonanza(
         new GuzzleClient(),
         $cache, // A PSR-6 item pool cache.
         '<YOUR-USER-PACKAGE-ID>',
         '<YOUR-API-KEY>'
-));
+    )
+);
 ```
 
-And inject it to Guzzle with somethine like:
+
+For SSL Private Proxy:
+```php
+$proxyManager = new ProxyManager(
+    new SslPrivateProxy(
+        new GuzzleClient(),
+        '<YOUR-API-KEY>'
+    )
+);
+```
+
+And inject it to Guzzle with something like:
 ```php
 $stack = new HandlerStack();
 $stack->setHandler(new CurlHandler());
