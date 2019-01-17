@@ -42,6 +42,7 @@ For SSL Private Proxy:
 $proxyManager = new ProxyManager(
     new SslPrivateProxy(
         new GuzzleClient(),
+        $cache, // A PSR-6 item pool cache.
         '<YOUR-API-KEY>'
     )
 );

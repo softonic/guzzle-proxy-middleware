@@ -7,6 +7,8 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Softonic\Proxy\Guzzle\Middleware\Exceptions\ProxiesNotAvailable;
 
 class SslPrivateProxyTest extends TestCase
@@ -27,7 +29,22 @@ class SslPrivateProxyTest extends TestCase
 
         $this->client = \Mockery::mock(GuzzleClient::class);
 
-        $this->sslPrivateProxy = new SslPrivateProxy($this->client, 'apikey');
+        $cacheItem = \Mockery::mock(CacheItemInterface::class);
+        $cacheItem->shouldReceive('isHit')
+            ->once()
+            ->andReturnFalse();
+        $cacheItem->shouldReceive('set');
+        $cacheItem->shouldReceive('expiresAfter');
+
+        $cache = \Mockery::mock(CacheItemPoolInterface::class);
+        $cache->shouldReceive('getItem')
+            ->once()
+            ->with('ssl_private_proxy_list')
+            ->andReturn($cacheItem);
+        $cache->shouldReceive('save');
+
+
+        $this->sslPrivateProxy = new SslPrivateProxy($this->client, $cache, 'apikey');
     }
 
     /**
@@ -37,7 +54,7 @@ class SslPrivateProxyTest extends TestCase
     {
         $this->client->shouldReceive('get')
             ->once()
-            ->with('https://www.sslprivateproxy.com/api/v1/apikey/getrandomproxy/')
+            ->with('https://www.sslprivateproxy.com/api/v1/apikey/listproxies/')
             ->andThrow(new RequestException('Error communicating with the server', new Request('GET', 'test')));
 
         $this->expectException(ProxiesNotAvailable::class);
@@ -53,7 +70,7 @@ class SslPrivateProxyTest extends TestCase
     {
         $this->client->shouldReceive('get')
             ->once()
-            ->with('https://www.sslprivateproxy.com/api/v1/apikey/getrandomproxy/')
+            ->with('https://www.sslprivateproxy.com/api/v1/apikey/listproxies/')
             ->andReturn(new Response(200, [], ''));
 
         $this->expectException(ProxiesNotAvailable::class);
@@ -69,7 +86,7 @@ class SslPrivateProxyTest extends TestCase
     {
         $this->client->shouldReceive('get')
             ->once()
-            ->with('https://www.sslprivateproxy.com/api/v1/apikey/getrandomproxy/')
+            ->with('https://www.sslprivateproxy.com/api/v1/apikey/listproxies/')
             ->andReturn(new Response(200, [], 'ip:port:user:pass'));
 
         $result = $this->sslPrivateProxy->get();
