@@ -5,7 +5,7 @@ namespace Softonic\Proxy\Guzzle\Middleware;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Softonic\Proxy\Guzzle\Middleware\Exceptions\ProxiesNotAvailable;
-use Softonic\Proxy\Guzzle\Middleware\Repositories\ProxyBonanza;
+use Softonic\Proxy\Guzzle\Middleware\Interfaces\ProxyInterface;
 
 class ProxyManagerTest extends TestCase
 {
@@ -14,7 +14,7 @@ class ProxyManagerTest extends TestCase
      */
     public function whenProxyBonanzaDoesNotRetrieveAProxyListItShouldThrowAnException()
     {
-        $proxyBonanza = \Mockery::mock(ProxyBonanza::class);
+        $proxyBonanza = \Mockery::mock(ProxyInterface::class);
         $handler      = function ($request, $options) {
             return 'response';
         };
@@ -38,7 +38,7 @@ class ProxyManagerTest extends TestCase
      */
     public function whenProxyIsAvailableItShouldSetTheProxyInTheRequest()
     {
-        $proxyBonanza = \Mockery::mock(ProxyBonanza::class);
+        $proxyBonanza = \Mockery::mock(ProxyInterface::class);
         $handler      = function ($request, $options) {
             return $options;
         };

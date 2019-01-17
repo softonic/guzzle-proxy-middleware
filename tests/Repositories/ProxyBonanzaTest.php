@@ -21,7 +21,7 @@ class ProxyBonanzaTest extends TestCase
         $mockCacheItem = $this->createMock(\Psr\Cache\CacheItemInterface::class);
         $mockCache->expects($this->once())
             ->method('getItem')
-            ->with(ProxyBonanza::CACHE_KEY)
+            ->with('proxy_bonanza_list')
             ->willReturn($mockCacheItem);
         $mockCacheItem->expects($this->once())
             ->method('isHit')
@@ -96,7 +96,7 @@ JSON;
         $mockCacheItem = $this->createMock(\Psr\Cache\CacheItemInterface::class);
         $mockCache->expects($this->once())
             ->method('getItem')
-            ->with(ProxyBonanza::CACHE_KEY)
+            ->with('proxy_bonanza_list')
             ->willReturn($mockCacheItem);
         $mockCache->expects($this->once())
             ->method('save')
@@ -109,7 +109,7 @@ JSON;
             ->with(['http://login11:pass11@99.22.11.22:45623']);
         $mockCacheItem->expects($this->once())
             ->method('expiresAfter')
-            ->with(ProxyBonanza::FOUR_HOURS);
+            ->with(ProxyBonanza::CACHE_TTL);
 
         $handler = new MockHandler(
             [
@@ -141,7 +141,7 @@ JSON;
         $mockCacheItem = $this->createMock(\Psr\Cache\CacheItemInterface::class);
         $mockCache->expects($this->once())
             ->method('getItem')
-            ->with(ProxyBonanza::CACHE_KEY)
+            ->with('proxy_bonanza_list')
             ->willReturn($mockCacheItem);
         $mockCacheItem->expects($this->once())
             ->method('isHit')
@@ -170,7 +170,7 @@ JSON;
         $mockCacheItem = $this->createMock(\Psr\Cache\CacheItemInterface::class);
         $mockCache->expects($this->once())
             ->method('getItem')
-            ->with(ProxyBonanza::CACHE_KEY)
+            ->with('proxy_bonanza_list')
             ->willReturn($mockCacheItem);
         $mockCache->expects($this->never())
             ->method('save');
