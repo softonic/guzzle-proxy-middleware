@@ -4,7 +4,12 @@ Guzzle Proxy Middleware
 [![Latest Version](https://img.shields.io/github/release/softonic/guzzle-proxy-middleware.svg?style=flat-square)](https://github.com/softonic/guzzle-proxy-middleware/releases)
 [![Software License](https://img.shields.io/badge/license-Apache%202.0-blue.svg?style=flat-square)](LICENSE.md)
 [![Build Status](https://img.shields.io/travis/softonic/guzzle-proxy-middleware/master.svg?style=flat-square)](https://travis-ci.org/softonic/guzzle-proxy-middleware)
+[![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/softonic/guzzle-proxy-middleware.svg?style=flat-square)](https://scrutinizer-ci.com/g/softonic/guzzle-proxy-middleware/code-structure)
+[![Quality Score](https://img.shields.io/scrutinizer/g/softonic/guzzle-proxy-middleware.svg?style=flat-square)](https://scrutinizer-ci.com/g/softonic/guzzle-proxy-middleware)
 [![Total Downloads](https://img.shields.io/packagist/dt/softonic/guzzle-proxy-middleware.svg?style=flat-square)](https://packagist.org/packages/softonic/guzzle-proxy-middleware)
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/softonic/guzzle-proxy-middleware.svg?style=flat-square)](http://isitmaintained.com/project/softonic/guzzle-proxy-middleware "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/softonic/guzzle-proxy-middleware.svg?style=flat-square)](http://isitmaintained.com/project/softonic/guzzle-proxy-middleware "Percentage of issues still open")
+
 
 This package provides middleware for [guzzle](https://github.com/guzzle/guzzle/) for handling proxy connection using one of the following proxy services:
 - [Proxy Bonanza](https://proxybonanza.com)
