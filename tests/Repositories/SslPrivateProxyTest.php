@@ -6,6 +6,7 @@ use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -13,30 +14,24 @@ use Softonic\Proxy\Guzzle\Middleware\Exceptions\ProxiesNotAvailable;
 
 class SslPrivateProxyTest extends TestCase
 {
-    /**
-     * @var GuzzleClient
-     */
-    private $client;
+    private GuzzleClient $client;
 
-    /**
-     * @var SslPrivateProxy
-     */
-    private $sslPrivateProxy;
+    private SslPrivateProxy $sslPrivateProxy;
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->client = \Mockery::mock(GuzzleClient::class);
+        $this->client = Mockery::mock(GuzzleClient::class);
 
-        $cacheItem = \Mockery::mock(CacheItemInterface::class);
+        $cacheItem = Mockery::mock(CacheItemInterface::class);
         $cacheItem->shouldReceive('isHit')
             ->once()
             ->andReturnFalse();
         $cacheItem->shouldReceive('set');
         $cacheItem->shouldReceive('expiresAfter');
 
-        $cache = \Mockery::mock(CacheItemPoolInterface::class);
+        $cache = Mockery::mock(CacheItemPoolInterface::class);
         $cache->shouldReceive('getItem')
             ->once()
             ->with('ssl_private_proxy_list')

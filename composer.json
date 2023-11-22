@@ -9,16 +9,16 @@
     "issues": "https://github.com/softonic/guzzle-proxy-middleware/issues"
   },
   "require": {
-    "php": ">=7.1",
-    "guzzlehttp/guzzle": "^6.3 || ^7.0",
-    "psr/cache": "^1.0"
+    "php": ">=8.1",
+    "guzzlehttp/guzzle": "^7.0",
+    "psr/cache": "^1.0|^2.0|^3.0"
   },
   "require-dev": {
-    "phpunit/phpunit": "^6.0",
+    "phpunit/phpunit": "^9.0",
     "mockery/mockery": "^1.0",
-    "friendsofphp/php-cs-fixer": "^2.4",
+    "friendsofphp/php-cs-fixer": "^3.6",
     "squizlabs/php_codesniffer": "^3",
-    "phpstan/phpstan": "^0.10.1"
+    "rector/rector": "^0.11.20"
   },
   "autoload": {
     "psr-4": {
@@ -31,10 +31,20 @@
     }
   },
   "scripts": {
-    "test": "phpunit --coverage-text; php-cs-fixer fix -v --diff --dry-run --allow-risky=yes;",
-    "phpstan": "phpstan analyse -l 7 src --no-interaction --no-progress",
+    "test": [
+      "@checkstyle",
+      "@phpunit"
+    ],
     "phpunit": "phpunit --coverage-text",
-    "phpcs": "php-cs-fixer fix -v --diff --dry-run --allow-risky=yes;",
-    "fix-cs": "php-cs-fixer fix -v --diff --allow-risky=yes;"
+    "checkstyle": [
+      "php-cs-fixer fix -v --diff --dry-run --allow-risky=yes",
+      "rector --dry-run"
+    ],
+    "fix-checkstyle": [
+      "@php-cs-fixer",
+      "@rector"
+    ],
+    "php-cs-fixer": "php-cs-fixer fix -v --diff --allow-risky=yes",
+    "rector": "rector"
   }
 }

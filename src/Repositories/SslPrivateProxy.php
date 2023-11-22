@@ -23,26 +23,12 @@ class SslPrivateProxy implements ProxyInterface
      */
     const CACHE_TTL = 14400;
 
-    /**
-     * @var GuzzleClient
-     */
-    private $client;
-
-    /**
-     * @var CacheItemPoolInterface
-     */
-    private $cache;
-
-    /**
-     * @var string
-     */
-    private $apiKey;
-
-    public function __construct(GuzzleClient $client, CacheItemPoolInterface $cache, string $apiKey)
+    public function __construct(
+        private readonly GuzzleClient           $client,
+        private readonly CacheItemPoolInterface $cache,
+        private readonly string                 $apiKey
+    )
     {
-        $this->client = $client;
-        $this->cache  = $cache;
-        $this->apiKey = $apiKey;
     }
 
     public function get()

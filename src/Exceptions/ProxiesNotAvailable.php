@@ -2,6 +2,8 @@
 
 namespace Softonic\Proxy\Guzzle\Middleware\Exceptions;
 
-class ProxiesNotAvailable extends \UnexpectedValueException
+use UnexpectedValueException;
+
+class ProxiesNotAvailable extends UnexpectedValueException
 {
 }

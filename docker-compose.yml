@@ -1,19 +1,7 @@
-version: '3.2'
+version: '3.8'
 
 services:
-  test:
+  composer:
     volumes:
-    - ./:/app
-    image: ricc/composer-prestissimo:latest
-    command: composer run test
-
-  fixcs:
-    volumes:
-    - ./:/app
-    image: ricc/composer-prestissimo:latest
-    command: composer run fix-cs
-
-  psysh:
-    volumes:
-    - ./:/app
-    image: ricc/psysh:latest
+      - ./:/app
+    image: softonic/composer-rector:latest

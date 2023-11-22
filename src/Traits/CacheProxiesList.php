@@ -2,6 +2,7 @@
 
 namespace Softonic\Proxy\Guzzle\Middleware\Traits;
 
+use Exception;
 use Softonic\Proxy\Guzzle\Middleware\Exceptions\ProxiesNotAvailable;
 
 trait CacheProxiesList
@@ -21,7 +22,7 @@ trait CacheProxiesList
             }
 
             return $proxiesList[random_int(0, count($proxiesList) - 1)];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw new ProxiesNotAvailable($e->getMessage(), 0, $e);
         }
     }
