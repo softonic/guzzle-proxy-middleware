@@ -21,36 +21,12 @@ class ProxyBonanza implements ProxyInterface
      */
     const CACHE_TTL = 14400;
 
-    /**
-     * @var GuzzleClient
-     */
-    private $client;
-
-    /**
-     * @var CacheItemPoolInterface
-     */
-    private $cache;
-
-    /**
-     * @var string
-     */
-    private $userPackage;
-
-    /**
-     * @var string
-     */
-    private $apiKey;
-
     public function __construct(
-        GuzzleClient $client,
-        CacheItemPoolInterface $cache,
-        string $userPackage,
-        string $apiKey
+        private readonly GuzzleClient           $client,
+        private readonly CacheItemPoolInterface $cache,
+        private readonly string                 $userPackage,
+        private readonly string                 $apiKey
     ) {
-        $this->client      = $client;
-        $this->cache       = $cache;
-        $this->userPackage = $userPackage;
-        $this->apiKey      = $apiKey;
     }
 
     public function get()
@@ -72,7 +48,7 @@ class ProxyBonanza implements ProxyInterface
             throw new ProxiesNotAvailable('Proxy response was not successful');
         }
 
-        $login    = $body['data']['login'];
+        $login = $body['data']['login'];
         $password = $body['data']['password'];
 
         $proxiesList = [];

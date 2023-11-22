@@ -1,0 +1,35 @@
+name: Init Project
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches:
+      - master
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git Commit/Push Changes
+        uses: actions/checkout@v3
+
+      - name: Substitute placeholders
+        run: |
+          name=$(echo ${{ github.event.repository.name }} | sed -e "s/[-_]/ /g" -e "s/\b\(.\)/\u\1/g")
+          namespace=$(echo ${{ github.event.repository.name }} | sed -e "s/[-_]/ /g" -e "s/\b\(.\)/\u\1/g" -e "s/ //g")
+          description=$(echo ${{ github.event.repository.description }} | sed -e 's@/@\\/@g')
+          sed -i -e "s/<PACKAGE-ID>/${{ github.event.repository.name }}/g" -e "s/<DESCRIPTION>/$description/g" -e "s/<NAMESPACE>/$namespace/g" composer.json
+          sed -i -e "s/<PACKAGE-ID>/${{ github.event.repository.name }}/g" -e "s/<DESCRIPTION>/$description/g" -e "s/<PACKAGE-NAME>/$name/g" README.md
+          sed -i "s/<PACKAGE-NAME>/$name/g" phpunit.xml
+          sed -i "s/<AUTHOR>/${{ github.actor }}/g" CODEOWNERS
+          git rm .github/workflows/init.yml
+
+      - name: Git Commit/Push Changes
+        uses: actions-x/commit@v6
+        with:
+          message: Applied template for basic configuration

@@ -20,7 +20,7 @@ class ProxyManager
     public function __invoke(callable $handler)
     {
         return function (RequestInterface $request, array $options) use ($handler) {
-            $proxy            = $this->proxy->get();
+            $proxy = $this->proxy->get();
             $options['proxy'] = $proxy;
 
             return $handler($request, $options);

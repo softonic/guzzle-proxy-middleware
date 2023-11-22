@@ -8,6 +8,8 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Softonic\Proxy\Guzzle\Middleware\Exceptions\ProxiesNotAvailable;
 
 class ProxyBonanzaTest extends TestCase
@@ -17,8 +19,8 @@ class ProxyBonanzaTest extends TestCase
      */
     public function whenProxyListIsUnavailableItShouldThrowAnException()
     {
-        $mockCache     = $this->createMock(\Psr\Cache\CacheItemPoolInterface::class);
-        $mockCacheItem = $this->createMock(\Psr\Cache\CacheItemInterface::class);
+        $mockCache     = $this->createMock(CacheItemPoolInterface::class);
+        $mockCacheItem = $this->createMock(CacheItemInterface::class);
         $mockCache->expects($this->once())
             ->method('getItem')
             ->with('proxy_bonanza_list')
@@ -92,8 +94,8 @@ class ProxyBonanzaTest extends TestCase
 }
 JSON;
 
-        $mockCache     = $this->createMock(\Psr\Cache\CacheItemPoolInterface::class);
-        $mockCacheItem = $this->createMock(\Psr\Cache\CacheItemInterface::class);
+        $mockCache     = $this->createMock(CacheItemPoolInterface::class);
+        $mockCacheItem = $this->createMock(CacheItemInterface::class);
         $mockCache->expects($this->once())
             ->method('getItem')
             ->with('proxy_bonanza_list')
@@ -137,8 +139,8 @@ JSON;
 }
 JSON;
 
-        $mockCache     = $this->createMock(\Psr\Cache\CacheItemPoolInterface::class);
-        $mockCacheItem = $this->createMock(\Psr\Cache\CacheItemInterface::class);
+        $mockCache     = $this->createMock(CacheItemPoolInterface::class);
+        $mockCacheItem = $this->createMock(CacheItemInterface::class);
         $mockCache->expects($this->once())
             ->method('getItem')
             ->with('proxy_bonanza_list')
@@ -166,8 +168,8 @@ JSON;
      */
     public function whenProxyListIsInCacheItShouldNotRefreshTheProxyList()
     {
-        $mockCache     = $this->createMock(\Psr\Cache\CacheItemPoolInterface::class);
-        $mockCacheItem = $this->createMock(\Psr\Cache\CacheItemInterface::class);
+        $mockCache     = $this->createMock(CacheItemPoolInterface::class);
+        $mockCacheItem = $this->createMock(CacheItemInterface::class);
         $mockCache->expects($this->once())
             ->method('getItem')
             ->with('proxy_bonanza_list')
