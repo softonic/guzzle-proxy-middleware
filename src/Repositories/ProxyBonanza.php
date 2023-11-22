@@ -26,8 +26,7 @@ class ProxyBonanza implements ProxyInterface
         private readonly CacheItemPoolInterface $cache,
         private readonly string                 $userPackage,
         private readonly string                 $apiKey
-    )
-    {
+    ) {
     }
 
     public function get()

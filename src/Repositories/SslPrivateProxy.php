@@ -27,8 +27,7 @@ class SslPrivateProxy implements ProxyInterface
         private readonly GuzzleClient           $client,
         private readonly CacheItemPoolInterface $cache,
         private readonly string                 $apiKey
-    )
-    {
+    ) {
     }
 
     public function get()
