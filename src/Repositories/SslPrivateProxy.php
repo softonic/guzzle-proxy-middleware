@@ -51,8 +51,15 @@ class SslPrivateProxy implements ProxyInterface
 
         $proxiesList = [];
         foreach ($proxiesData as $proxyData) {
+            $proxyData = trim($proxyData);
             if (!empty($proxyData)) {
-                list($ip, $port, $username, $password) = explode(':', $proxyData);
+                $proxyParts = explode(':', $proxyData);
+                if (count($proxyParts) !== 4) {
+                    throw new ProxiesNotAvailable(
+                        sprintf('Unexpected proxy list line "%s"', mb_substr($proxyData, 0, 100))
+                    );
+                }
+                list($ip, $port, $username, $password) = $proxyParts;
 
                 $proxiesList[] = "http://$username:$password@$ip:$port";
             }
