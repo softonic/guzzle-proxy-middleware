@@ -153,35 +153,4 @@ class SslPrivateProxyTest extends TestCase
 
         $this->sslPrivateProxy->get();
     }
-
-    /**
-     * @test
-     */
-    public function whenTheWholeListIsAskedForItShouldReturnEveryProxy()
-    {
-        $this->client->shouldReceive('get')
-            ->once()
-            ->with('https://www.sslprivateproxy.com/api/v1/apikey/listproxies/')
-            ->andReturn(new Response(200, [], "1.2.3.4:8080:user:pass\n5.6.7.8:8080:user2:pass2\n"));
-
-        $this->assertSame(
-            ['http://user:pass@1.2.3.4:8080', 'http://user2:pass2@5.6.7.8:8080'],
-            $this->sslPrivateProxy->all()
-        );
-    }
-
-    /**
-     * @test
-     */
-    public function whenTheWholeListIsAskedForAndTheProviderFailsItShouldThrowAnException()
-    {
-        $this->client->shouldReceive('get')
-            ->once()
-            ->andReturn(new Response(200, [], ''));
-
-        $this->expectException(ProxiesNotAvailable::class);
-        $this->expectExceptionMessage('Proxy response was not successful');
-
-        $this->sslPrivateProxy->all();
-    }
 }

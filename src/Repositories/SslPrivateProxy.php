@@ -6,10 +6,9 @@ use GuzzleHttp\Client as GuzzleClient;
 use Psr\Cache\CacheItemPoolInterface;
 use Softonic\Proxy\Guzzle\Middleware\Exceptions\ProxiesNotAvailable;
 use Softonic\Proxy\Guzzle\Middleware\Interfaces\ProxyInterface;
-use Softonic\Proxy\Guzzle\Middleware\Interfaces\ProxyListInterface;
 use Softonic\Proxy\Guzzle\Middleware\Traits\CacheProxiesList;
 
-class SslPrivateProxy implements ProxyInterface, ProxyListInterface
+class SslPrivateProxy implements ProxyInterface
 {
     use CacheProxiesList;
 
@@ -34,11 +33,6 @@ class SslPrivateProxy implements ProxyInterface, ProxyListInterface
     public function get()
     {
         return $this->getProxyUsingCache();
-    }
-
-    public function all(): array
-    {
-        return $this->getProxyListUsingCache();
     }
 
     protected function getFreshProxyList(): array
