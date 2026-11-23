@@ -12,6 +12,7 @@ use Illuminate\Cache\Repository;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
+use Psr\Log\LoggerInterface;
 use Softonic\Proxy\Guzzle\Middleware\Exceptions\ProxiesNotAvailable;
 use Softonic\Proxy\Guzzle\Middleware\Interfaces\ProxyInterface;
 
@@ -21,11 +22,15 @@ class ProxyManagerTest extends TestCase
 
     private const B = 'http://user:pass@10.0.0.2:8080';
 
+    private const C = 'http://user:pass@10.0.0.3:8080';
+
     private Repository $cache;
 
     private array $nextProxies = [];
 
     private ProxyManager $proxyManager;
+
+    private $logger;
 
     protected function setUp(): void
     {
@@ -34,7 +39,14 @@ class ProxyManagerTest extends TestCase
         $proxies->shouldReceive('get')->andReturnUsing(
             fn () => count($this->nextProxies) > 1 ? array_shift($this->nextProxies) : $this->nextProxies[0]
         );
-        $this->proxyManager = new ProxyManager($proxies, $this->cache);
+        $this->logger       = Mockery::spy(LoggerInterface::class);
+        $this->proxyManager = new ProxyManager($proxies, $this->cache, $this->logger);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->addToAssertionCount(Mockery::getContainer()->mockery_getExpectationCount());
+        Mockery::close();
     }
 
     /**
@@ -98,6 +110,25 @@ class ProxyManagerTest extends TestCase
         $this->assertSame(self::A, $this->send([self::A, self::B], $this->unreachable()));
 
         $this->assertSame(self::B, $this->send([self::A, self::B], $this->success()));
+    }
+
+    /**
+     * @test
+     */
+    public function whenAProxyIsQuarantinedItShouldWarnWithTheShareOfTheQuarantinedPool()
+    {
+        $this->send([self::A], $this->unreachable());
+        $this->send([self::A], $this->unreachable());
+        $this->logger->shouldNotHaveReceived('warning');
+
+        $this->send(array_merge([self::A], array_fill(0, 25, self::A), array_fill(0, 25, self::C)), $this->unreachable());
+
+        $this->logger->shouldHaveReceived('warning')->once()->with('Proxy quarantined', [
+            'proxy'             => '10.0.0.1:8080',
+            'failures'          => 3,
+            'penalty_seconds'   => 3 * 3600,
+            'quarantined_share' => 0.5,
+        ]);
     }
 
     /**
@@ -181,6 +212,7 @@ class ProxyManagerTest extends TestCase
         $this->cache->set($this->key(self::B), [3, time() + 60]);
 
         $this->assertSame(self::B, $this->send([self::A, self::A, self::A, self::A, self::B, self::A], $this->success()));
+        $this->logger->shouldHaveReceived('warning')->once()->with('Every drawn proxy is quarantined, using one anyway', ['draws' => 5]);
     }
 
     private function assertNotBlamedFor(array $handlerContext): void

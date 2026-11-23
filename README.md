@@ -68,12 +68,20 @@ From now on every request sent with `$guzzleClient` will be done using a random 
 Pass a PSR-16 cache shared by every worker as the second argument, such as `Cache::store('redis')` in Laravel:
 
 ```php
-$proxyManager = new ProxyManager(new SslPrivateProxy(/* ... */), Cache::store('redis'));
+$proxyManager = new ProxyManager(new SslPrivateProxy(/* ... */), Cache::store('redis'), $logger);
 ```
 
 A proxy whose connection is refused or times out 3 times in a row is left out for 3 hours. If it fails again
 when it comes back, for 1 day, then 2 days, then 30 days. A request that goes through it forgets its failures.
 Failures of the site behind a proxy that did connect never count against the proxy.
+
+With a PSR-3 logger, two warnings let you alert before every request fails:
+
+- `Proxy quarantined`, with the proxy (without its credentials), its failures, the penalty and
+  `quarantined_share`: the share of the pool in quarantine, estimated from 50 random draws.
+- `Every drawn proxy is quarantined, using one anyway`: 5 draws in a row hit a quarantined proxy. It is rare while
+  most of the pool works (0.24^5 = 0.08% of requests with a quarter quarantined) and logged on most requests once
+  nearly all of it is, when no new proxy can be quarantined any more.
 
 The failing request is not retried: push Guzzle's retry middleware before the proxy manager and each retry
 goes through another proxy.

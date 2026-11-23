@@ -5,6 +5,8 @@ namespace Softonic\Proxy\Guzzle\Middleware;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Promise\Create;
 use Psr\Http\Message\RequestInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use Softonic\Proxy\Guzzle\Middleware\Interfaces\ProxyInterface;
 
@@ -20,6 +22,8 @@ class ProxyManager
 
     private const PICKS = 5;
 
+    private const SHARE_SAMPLE = 50;
+
     private const CURLE_COULDNT_CONNECT = 7;
 
     private const CURLE_OPERATION_TIMEDOUT = 28;
@@ -34,10 +38,16 @@ class ProxyManager
      */
     private $cache;
 
-    public function __construct(ProxyInterface $proxy, ?CacheInterface $cache = null)
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(ProxyInterface $proxy, ?CacheInterface $cache = null, LoggerInterface $logger = new NullLogger())
     {
-        $this->proxy = $proxy;
-        $this->cache = $cache;
+        $this->proxy  = $proxy;
+        $this->cache  = $cache;
+        $this->logger = $logger;
     }
 
     public function __invoke(callable $handler)
@@ -77,7 +87,13 @@ class ProxyManager
             $proxy = $this->proxy->get();
             [$failures, $quarantinedUntil] = $this->cache->get(self::key($proxy), [0, 0]);
 
-            if ($quarantinedUntil <= time() || $pick === self::PICKS) {
+            if ($quarantinedUntil <= time()) {
+                return [$proxy, $failures];
+            }
+
+            if ($pick === self::PICKS) {
+                $this->logger->warning('Every drawn proxy is quarantined, using one anyway', ['draws' => self::PICKS]);
+
                 return [$proxy, $failures];
             }
         }
@@ -97,6 +113,33 @@ class ProxyManager
         $penalty = $failures < self::QUARANTINE_AFTER_FAILURES ? 0 : self::PENALTY_SECONDS[$failures] ?? self::BAN_SECONDS;
 
         $this->cache->set(self::key($proxy), [$failures, time() + $penalty], $penalty + self::FORGET_FAILURES_AFTER_SECONDS);
+
+        if ($penalty > 0) {
+            $this->logger->warning('Proxy quarantined', [
+                'proxy'             => self::withoutCredentials($proxy),
+                'failures'          => $failures,
+                'penalty_seconds'   => $penalty,
+                'quarantined_share' => $this->quarantinedShare(),
+            ]);
+        }
+    }
+
+    private function quarantinedShare(): float
+    {
+        // shortcut: estimated from SHARE_SAMPLE draws (about ±7 points around 50%); read the whole list if an exact figure is needed.
+        $drawn = [];
+        for ($i = 0; $i < self::SHARE_SAMPLE; $i++) {
+            $drawn[] = self::key($this->proxy->get());
+        }
+
+        $records     = $this->cache->getMultiple(array_unique($drawn), [0, 0]);
+        $records     = is_array($records) ? $records : iterator_to_array($records);
+        $quarantined = 0;
+        foreach ($drawn as $key) {
+            $quarantined += $records[$key][1] > time() ? 1 : 0;
+        }
+
+        return round($quarantined / self::SHARE_SAMPLE, 2);
     }
 
     private function forgive(string $proxy, int $failures): void
@@ -104,6 +147,13 @@ class ProxyManager
         if ($failures > 0) {
             $this->cache->delete(self::key($proxy));
         }
+    }
+
+    private static function withoutCredentials(string $proxy): string
+    {
+        $parts = parse_url($proxy);
+
+        return ($parts['host'] ?? 'unparseable') . (isset($parts['port']) ? ":{$parts['port']}" : '');
     }
 
     /**
