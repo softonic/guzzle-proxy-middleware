@@ -6,9 +6,10 @@ use GuzzleHttp\Client as GuzzleClient;
 use Psr\Cache\CacheItemPoolInterface;
 use Softonic\Proxy\Guzzle\Middleware\Exceptions\ProxiesNotAvailable;
 use Softonic\Proxy\Guzzle\Middleware\Interfaces\ProxyInterface;
+use Softonic\Proxy\Guzzle\Middleware\Interfaces\ProxyListInterface;
 use Softonic\Proxy\Guzzle\Middleware\Traits\CacheProxiesList;
 
-class ProxyBonanza implements ProxyInterface
+class ProxyBonanza implements ProxyInterface, ProxyListInterface
 {
     use CacheProxiesList;
 
@@ -32,6 +33,11 @@ class ProxyBonanza implements ProxyInterface
     public function get()
     {
         return $this->getProxyUsingCache();
+    }
+
+    public function all(): array
+    {
+        return $this->getProxyListUsingCache();
     }
 
     protected function getFreshProxyList(): array

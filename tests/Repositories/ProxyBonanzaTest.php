@@ -197,4 +197,27 @@ JSON;
             $proxyUrl
         );
     }
+
+    /**
+     * @test
+     */
+    public function whenTheWholeListIsInCacheItShouldReturnEveryProxy()
+    {
+        $mockCache     = $this->createMock(CacheItemPoolInterface::class);
+        $mockCacheItem = $this->createMock(CacheItemInterface::class);
+        $mockCache->method('getItem')
+            ->with('proxy_bonanza_list')
+            ->willReturn($mockCacheItem);
+        $mockCacheItem->method('isHit')
+            ->willReturn(true);
+        $mockCacheItem->method('get')
+            ->willReturn(['http://login11:pass11@99.22.11.22:45623', 'http://login11:pass11@99.22.11.23:45623']);
+
+        $proxy = new ProxyBonanza(new GuzzleClient(), $mockCache, '1234', 'ABCD');
+
+        $this->assertSame(
+            ['http://login11:pass11@99.22.11.22:45623', 'http://login11:pass11@99.22.11.23:45623'],
+            $proxy->all()
+        );
+    }
 }
